@@ -1,5 +1,8 @@
 import { createServerFn } from '@tanstack/react-start'
+import { renderServerComponent } from '@tanstack/react-start/rsc'
 import { setResponseHeader } from '@tanstack/react-start/server'
+
+import { Trending } from '#/components/ppc/Trending'
 
 export type TrendingStory = {
   id: string
@@ -80,12 +83,18 @@ export function publishTrendingStory(
   return { story, number: s.publishCounter }
 }
 
-export const getTrending = createServerFn({ method: 'GET' }).handler(() => {
+/**
+ * Returns an RSC renderable for {@link Trending}. The TanStack Start serializer
+ * carries the Flight payload from server to client; the route component embeds
+ * the renderable directly with `{Trending}` — no client-side decode helper.
+ */
+export const getTrending = createServerFn({ method: 'GET' }).handler(async () => {
   setResponseHeader('Cache-Control', 'max-age=0, s-maxage=30')
   setResponseHeader('Cache-Tag', 'trending, homepage')
   const generatedAt = new Date().toISOString()
   return {
-    stories: getTrendingState().list,
-    generatedAt,
+    Trending: await renderServerComponent(
+      <Trending stories={getTrendingState().list} generatedAt={generatedAt} />,
+    ),
   }
 })
