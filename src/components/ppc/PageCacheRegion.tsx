@@ -13,7 +13,7 @@ export function PageCacheRegion({
 }: Props) {
   return (
     <div
-      className="ppc-region-page relative mb-6 w-full min-w-0 rounded-lg border-2 border-dashed bg-[var(--surface)] p-6 pb-10 pt-9 shadow-sm"
+      className="ppc-region-page relative mb-6 w-full min-w-0 rounded-lg border-2 border-dashed bg-(--surface) p-6 pb-10 pt-9 shadow-sm"
     >
       <div
         className="ppc-label-page absolute left-3 top-3 z-[1] font-mono text-[11px] font-bold uppercase tracking-tight"

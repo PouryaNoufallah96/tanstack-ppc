@@ -2,6 +2,15 @@
 /**
  * POSTs a new headline to the running app (in-memory TRENDING + publish counter).
  *
+ * Story type is selected via `STORY_TYPE`:
+ *   - `basic` → renders with the server-only `BasicStory` (no JS shipped).
+ *   - `interactive` (default) → renders with the `'use client'` `InteractiveStory`
+ *     and triggers the browser to lazy-load that chunk via the RSC Flight stream.
+ *
+ * Use the package scripts:
+ *   pnpm add-basic-story "..."
+ *   pnpm add-interactive-story "..."
+ *
  * Tries several bases by default: Vite often binds ::1 only, so `127.0.0.1:3000`
  * can fail while `localhost:3000` works. With `pnpm demo`, :8080 also forwards POST
  * to the origin.
@@ -18,9 +27,19 @@ import process from 'node:process'
 
 const headline = process.argv.slice(2).join(' ').trim()
 if (!headline) {
-  console.error('Usage: pnpm add-story "Your headline here"')
+  console.error(
+    'Usage: pnpm add-basic-story "Your headline" | pnpm add-interactive-story "Your headline"',
+  )
   process.exit(1)
 }
+
+const rawType = (process.env.STORY_TYPE || 'interactive').toLowerCase()
+if (rawType !== 'basic' && rawType !== 'interactive') {
+  console.error(`STORY_TYPE must be "basic" or "interactive" (got "${rawType}")`)
+  process.exit(1)
+}
+/** @type {'basic' | 'interactive'} */
+const type = rawType
 
 const timeoutMs = 10_000
 const purgeToken = process.env.PURGE_TOKEN || 'demo'
@@ -94,12 +113,12 @@ for (const base of bases) {
     const res = await fetch(`${base}/publish-trending`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ headline }),
+      body: JSON.stringify({ headline, type }),
       signal: AbortSignal.timeout(timeoutMs),
     })
     const data = await res.json().catch(() => null)
     if (res.ok && data?.ok && data.story) {
-      console.log(`#${data.number} — ${data.story.headline}`)
+      console.log(`#${data.number} [${data.story.type}] — ${data.story.headline}`)
       await purgeTrendingAtEdge()
       process.exit(0)
     }

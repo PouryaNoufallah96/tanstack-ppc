@@ -96,48 +96,48 @@ export function Newsroom() {
   }
 
   return (
-    <div className="space-y-5 text-[var(--sea-ink)]">
-      <p className="m-0 text-sm text-[var(--sea-ink-soft)]">
+    <div className="space-y-5 text-(--sea-ink)">
+      <p className="m-0 text-sm text-(--sea-ink-soft)">
         Wire actions for the video: publish changes server data first; the proxy can still
         serve the old <code>trending</code> response until you purge the tag. Publish
-        endpoint: <code className="text-[var(--sea-ink)]">POST /publish-trending</code> (
-        <code className="text-[var(--sea-ink)]">src/routes/__newsroom/publish-trending.ts</code>
+        endpoint: <code className="text-(--sea-ink)">POST /publish-trending</code> (
+        <code className="text-(--sea-ink)">src/routes/__newsroom/publish-trending.ts</code>
         ).
       </p>
       <div>
         <button
           type="button"
           onClick={publish}
-          className="rounded border border-[var(--line)] bg-[var(--chip-bg)] px-3 py-1.5 font-mono text-xs text-[var(--sea-ink)] hover:bg-[var(--link-bg-hover)]"
+          className="rounded border border-(--line) bg-(--chip-bg) px-3 py-1.5 font-mono text-xs text-(--sea-ink) hover:bg-(--link-bg-hover)"
         >
           [ publish trending story ]
         </button>
         {pubMsg ? (
-          <p className="mt-2 m-0 font-mono text-xs text-[var(--sea-ink-soft)]">{pubMsg}</p>
+          <p className="mt-2 m-0 font-mono text-xs text-(--sea-ink-soft)">{pubMsg}</p>
         ) : null}
       </div>
       <div>
         <button
           type="button"
           onClick={purgeTag}
-          className="rounded border border-[var(--line)] bg-[var(--chip-bg)] px-3 py-1.5 font-mono text-xs text-[var(--sea-ink)] hover:bg-[var(--link-bg-hover)]"
+          className="rounded border border-(--line) bg-(--chip-bg) px-3 py-1.5 font-mono text-xs text-(--sea-ink) hover:bg-(--link-bg-hover)"
         >
           [ Purge "trending" tag in proxy ]
         </button>
         {tagMsg ? (
-          <p className="mt-2 m-0 font-mono text-xs text-[var(--sea-ink-soft)]">{tagMsg}</p>
+          <p className="mt-2 m-0 font-mono text-xs text-(--sea-ink-soft)">{tagMsg}</p>
         ) : null}
       </div>
       <div>
         <button
           type="button"
           onClick={purgeAll}
-          className="rounded border border-[var(--line)] bg-[var(--chip-bg)] px-3 py-1.5 font-mono text-xs text-[var(--sea-ink)] hover:bg-[var(--link-bg-hover)]"
+          className="rounded border border-(--line) bg-(--chip-bg) px-3 py-1.5 font-mono text-xs text-(--sea-ink) hover:bg-(--link-bg-hover)"
         >
           [ Purge all in proxy ]
         </button>
         {allMsg ? (
-          <p className="mt-2 m-0 font-mono text-xs text-[var(--sea-ink-soft)]">{allMsg}</p>
+          <p className="mt-2 m-0 font-mono text-xs text-(--sea-ink-soft)">{allMsg}</p>
         ) : null}
       </div>
     </div>

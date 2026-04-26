@@ -12,7 +12,8 @@
     "proxy": "node cdn-simulator.mjs",
     "cdn": "node cdn-simulator.mjs",
     "demo": "node scripts/ppc-demo.mjs",
-    "add-story": "node scripts/add-story.mjs",
+    "add-basic-story": "STORY_TYPE=basic node scripts/add-story.mjs",
+    "add-interactive-story": "STORY_TYPE=interactive node scripts/add-story.mjs",
     "test": "vitest run"
   },
   "dependencies": {

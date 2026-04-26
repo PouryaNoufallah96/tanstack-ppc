@@ -46,7 +46,8 @@ pnpm cdn        # or pnpm proxy — :8080 in another terminal
 | `pnpm preview` | Serves the built app on port 3000 |
 | `pnpm cdn` / `pnpm proxy` | Starts [`cdn-simulator.mjs`](cdn-simulator.mjs) (port 8080 → origin 3000) |
 | `pnpm demo` | [`scripts/ppc-demo.mjs`](scripts/ppc-demo.mjs): build + preview + `cdn-simulator` |
-| `pnpm add-story "…"` | [`scripts/add-story.mjs`](scripts/add-story.mjs): `POST /publish-trending` with a custom headline, then (unless `SKIP_EDGE_PURGE=1`) purges the CDN tag **`trending`** on :8080 so `getTrending` / `/_serverFn/…` is not left stale. Tries the same app bases as before; set `ORIGIN` / `PURGE_ORIGIN` to pin URLs. `PURGE_TOKEN` matches [`cdn-simulator.mjs`](cdn-simulator.mjs) (default `demo`). |
+| `pnpm add-basic-story "…"` | [`scripts/add-story.mjs`](scripts/add-story.mjs) with `STORY_TYPE=basic`: `POST /publish-trending` adds a `basic` story (renders with the server-only `BasicStory` — no JS shipped for that tile). Then (unless `SKIP_EDGE_PURGE=1`) purges the CDN tag **`trending`** on :8080. `ORIGIN` / `PURGE_ORIGIN` pin URLs; `PURGE_TOKEN` matches [`cdn-simulator.mjs`](cdn-simulator.mjs) (default `demo`). |
+| `pnpm add-interactive-story "…"` | Same as above with `STORY_TYPE=interactive`: adds an `interactive` story (renders with the `'use client'` `InteractiveStory`). The browser lazy-loads the InteractiveStory chunk via the RSC Flight stream **only** when at least one story is interactive. |
 | `pnpm test` | Vitest (no tests in the repo yet) |
 
 ## What’s what

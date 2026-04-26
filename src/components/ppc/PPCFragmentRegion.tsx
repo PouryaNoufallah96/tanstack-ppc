@@ -15,7 +15,7 @@ export function PPCFragmentRegion({
 }: Props) {
   return (
     <div
-      className="ppc-region-fragment relative mb-6 w-full min-w-0 rounded-lg border-2 border-dashed bg-[var(--surface)] p-6 pb-10 pt-9 shadow-sm lg:mb-0"
+      className="ppc-region-fragment relative mb-6 w-full min-w-0 rounded-lg border-2 border-dashed bg-(--surface) p-6 pb-10 pt-9 shadow-sm lg:mb-0"
     >
       <div
         className="ppc-label-fragment absolute left-3 top-3 z-[1] font-mono text-[11px] font-bold uppercase tracking-tight"

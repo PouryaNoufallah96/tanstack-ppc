@@ -21,7 +21,7 @@ function PpcNewsHome() {
   const { hero, latest } = Route.useLoaderData()
   return (
     <main className="page-wrap w-full max-w-7xl px-4 pb-10 pt-8 sm:px-5">
-      <p className="m-0 mb-6 text-center text-xs font-semibold tracking-[0.18em] text-[var(--kicker)] sm:text-left">
+      <p className="m-0 mb-6 text-center text-xs font-semibold tracking-[0.18em] text-(--kicker) sm:text-left">
         Partial page caching (demo)
       </p>
 
@@ -32,7 +32,7 @@ function PpcNewsHome() {
           </PageCacheRegion>
 
           <PageCacheRegion>
-            <h2 className="m-0 mb-4 text-xl font-bold text-[var(--sea-ink)]">Latest news</h2>
+            <h2 className="m-0 mb-4 text-xl font-bold text-(--sea-ink)">Latest news</h2>
             <ArticleGrid articles={latest} />
           </PageCacheRegion>
 

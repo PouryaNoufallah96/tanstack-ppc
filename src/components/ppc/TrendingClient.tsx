@@ -33,11 +33,11 @@ export function TrendingClient() {
   if (!rsc) {
     return (
       <div className="space-y-3 animate-pulse" aria-busy>
-        <div className="h-6 w-40 rounded bg-[var(--line)]" />
-        <div className="h-4 w-full rounded bg-[var(--line)]" />
-        <div className="h-4 w-5/6 rounded bg-[var(--line)]" />
-        <div className="h-4 w-full rounded bg-[var(--line)]" />
-        <p className="m-0 font-mono text-xs text-[var(--sea-ink-soft)]">
+        <div className="h-6 w-40 rounded bg-(--line)" />
+        <div className="h-4 w-full rounded bg-(--line)" />
+        <div className="h-4 w-5/6 rounded bg-(--line)" />
+        <div className="h-4 w-full rounded bg-(--line)" />
+        <p className="m-0 font-mono text-xs text-(--sea-ink-soft)">
           Loading RSC from <code>getTrending</code> (Flight stream)…
         </p>
       </div>
