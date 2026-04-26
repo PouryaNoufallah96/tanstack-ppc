@@ -8,7 +8,11 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "build": "vite build",
-    "preview": "vite preview",
+    "preview": "vite preview --port 3000",
+    "proxy": "node cdn-simulator.mjs",
+    "cdn": "node cdn-simulator.mjs",
+    "demo": "node scripts/ppc-demo.mjs",
+    "add-story": "node scripts/add-story.mjs",
     "test": "vitest run"
   },
   "dependencies": {

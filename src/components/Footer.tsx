@@ -1,3 +1,5 @@
+import ThemeToggle from './ThemeToggle'
+
 export default function Footer() {
   const year = new Date().getFullYear()
 
@@ -7,7 +9,10 @@ export default function Footer() {
         <p className="m-0 text-sm">
           &copy; {year} Your name here. All rights reserved.
         </p>
-        <p className="island-kicker m-0">Built with TanStack Start</p>
+        <div className="flex items-center gap-3">
+          <p className="island-kicker m-0">Built with TanStack Start</p>
+          <ThemeToggle />
+        </div>
       </div>
       <div className="mt-4 flex justify-center gap-4">
         <a

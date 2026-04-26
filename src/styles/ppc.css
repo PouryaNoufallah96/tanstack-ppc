@@ -1,0 +1,72 @@
+/* PPC news demo — high-contrast borders for screen recording */
+
+:root {
+  --ppc-page: #3b82f6;
+  --ppc-fragment: #f59e0b;
+  --ppc-control: #71717a;
+}
+
+.ppc-region-page {
+  border-color: var(--ppc-page);
+  color: var(--sea-ink);
+}
+
+.ppc-label-page {
+  color: var(--ppc-page);
+}
+
+.ppc-meta-page {
+  color: var(--ppc-page);
+}
+
+.ppc-region-fragment {
+  border-color: var(--ppc-fragment);
+}
+
+.ppc-label-fragment {
+  color: var(--ppc-fragment);
+}
+
+.ppc-meta-fragment {
+  color: var(--ppc-fragment);
+}
+
+.ppc-region-control {
+  border-color: var(--ppc-control);
+}
+
+.ppc-label-control {
+  color: var(--ppc-control);
+}
+
+.ppc-legend-swatch {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.ppc-legend-swatch__box {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 6px;
+  border-width: 2px;
+  border-style: dashed;
+}
+
+.ppc-legend-swatch__box--page {
+  border-color: var(--ppc-page);
+  background: color-mix(in oklab, var(--ppc-page) 8%, white);
+}
+
+.ppc-legend-swatch__box--fragment {
+  border-color: var(--ppc-fragment);
+  background: color-mix(in oklab, var(--ppc-fragment) 8%, white);
+}
+
+.ppc-legend-swatch__box--control {
+  border-style: solid;
+  border-color: var(--ppc-control);
+  background: color-mix(in oklab, var(--ppc-control) 6%, white);
+}

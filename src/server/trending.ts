@@ -1,0 +1,91 @@
+import { createServerFn } from '@tanstack/react-start'
+import { setResponseHeader } from '@tanstack/react-start/server'
+
+export type TrendingStory = {
+  id: string
+  headline: string
+  byline: string
+  minutesAgo: number
+}
+
+const seed: TrendingStory[] = [
+  {
+    id: 't-1',
+    headline: 'Shippers brace for a busy week at major ports',
+    byline: 'Elena Park',
+    minutesAgo: 8,
+  },
+  {
+    id: 't-2',
+    headline: 'City council to revisit zoning near transit hubs',
+    byline: 'Omar Haddad',
+    minutesAgo: 12,
+  },
+  {
+    id: 't-3',
+    headline: 'Analysts trim forecasts after surprise inventory data',
+    byline: 'Nina Voss',
+    minutesAgo: 19,
+  },
+  {
+    id: 't-4',
+    headline: 'League issues guidance on new injury protocols',
+    byline: 'Cam Weber',
+    minutesAgo: 24,
+  },
+  {
+    id: 't-5',
+    headline: 'Lab showcases a low-power display prototype',
+    byline: 'Priya Iyer',
+    minutesAgo: 31,
+  },
+]
+
+/** Shared across duplicate Nitro/RSC+SSR bundle copies of this module. */
+const TRENDING_STATE = Symbol.for('ppc.trendingState.v1')
+type TrendingState = { list: TrendingStory[]; publishCounter: number }
+
+function getTrendingState(): TrendingState {
+  const w = globalThis as typeof globalThis & { [k: symbol]: TrendingState | undefined }
+  if (!w[TRENDING_STATE]) {
+    const list = [...seed]
+    w[TRENDING_STATE] = { list, publishCounter: list.length }
+  }
+  return w[TRENDING_STATE]!
+}
+
+const MAX_HEADLINE_LEN = 500
+
+export function publishTrendingStory(
+  input?: { headline?: string | null },
+): { story: TrendingStory; number: number } {
+  const s = getTrendingState()
+  s.publishCounter += 1
+  const t = new Date()
+  const hh = String(t.getHours()).padStart(2, '0')
+  const mm = String(t.getMinutes()).padStart(2, '0')
+  const ss = String(t.getSeconds()).padStart(2, '0')
+  const custom = input?.headline?.trim()
+  const headline =
+    custom && custom.length > 0
+      ? custom.slice(0, MAX_HEADLINE_LEN)
+      : `Breaking: Story #${s.publishCounter} at ${hh}:${mm}:${ss}`
+  const story: TrendingStory = {
+    id: `t-${Date.now()}`,
+    headline,
+    byline: 'Wire Desk',
+    minutesAgo: 0,
+  }
+  s.list = [story, ...s.list]
+  return { story, number: s.publishCounter }
+}
+
+export const getTrending = createServerFn({ method: 'GET' }).handler(() => {
+  setResponseHeader('Cache-Control', 'max-age=0, s-maxage=30')
+  setResponseHeader('Cache-Tag', 'trending, homepage')
+  const generatedAt = new Date().toISOString()
+  return {
+    stories: getTrendingState().list,
+    generatedAt,
+  }
+})

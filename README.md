@@ -1,193 +1,85 @@
-Welcome to your new TanStack Start app! 
+# Partial page caching (PPC)
 
-# Getting Started
+TanStack Start + React Server Components, with a local [**CDN simulator**](cdn-simulator.mjs) (reverse proxy) that mimics CDN caching (`Cache-Control`, `Vary`, `Cache-Tag`) and a **news-site-style** home page ([`src/routes/index.tsx`](src/routes/index.tsx)) for recordings. `/ppc-demo` **redirects** to `/` for old links.
 
-To run this application:
+## Quick start
 
 ```bash
 pnpm install
+```
+
+**Local development** (HMR, no proxy):
+
+```bash
 pnpm dev
 ```
 
-# Building For Production
+App: `http://localhost:3000`
 
-To build this application for production:
+**Production-style demo** (stable caching — use this when filming cache hits/misses):
+
+```bash
+pnpm demo
+```
+
+This runs, in order: `pnpm build` → Vite preview on **:3000** → [`cdn-simulator.mjs`](cdn-simulator.mjs) on **:8080**. Open the app through the simulator:
+
+- **App:** [http://localhost:8080/](http://localhost:8080/) (PPC home)
+- **Cache visualizer:** [http://localhost:8080/__cache/view](http://localhost:8080/__cache/view) (send header `X-Purge-Token: demo`)
+
+The home route is **server-rendered**: hero and latest news come from the route loader. The **trending** block is **client-only** — it fetches with the `getTrending` GET server function after hydration (`GET /_serverFn/…` in DevTools), with its own `Cache-Control` + `Cache-Tag`. Purge actions in the newsroom panel call the simulator on port 8080 (or same-origin when you are already on `:8080`). Stop both servers with **Ctrl+C**.
+
+**Manual** (same as `pnpm demo`, but two terminals):
 
 ```bash
 pnpm build
+pnpm preview    # :3000
+pnpm cdn        # or pnpm proxy — :8080 in another terminal
 ```
 
-## Testing
+## Scripts
 
-This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
+| Command | What it does |
+|--------|----------------|
+| `pnpm dev` | Vite dev server on port 3000 |
+| `pnpm build` | Production build (RSC, client, SSR, Nitro) |
+| `pnpm preview` | Serves the built app on port 3000 |
+| `pnpm cdn` / `pnpm proxy` | Starts [`cdn-simulator.mjs`](cdn-simulator.mjs) (port 8080 → origin 3000) |
+| `pnpm demo` | [`scripts/ppc-demo.mjs`](scripts/ppc-demo.mjs): build + preview + `cdn-simulator` |
+| `pnpm add-story "…"` | [`scripts/add-story.mjs`](scripts/add-story.mjs): `POST /publish-trending` with a custom headline, then (unless `SKIP_EDGE_PURGE=1`) purges the CDN tag **`trending`** on :8080 so `getTrending` / `/_serverFn/…` is not left stale. Tries the same app bases as before; set `ORIGIN` / `PURGE_ORIGIN` to pin URLs. `PURGE_TOKEN` matches [`cdn-simulator.mjs`](cdn-simulator.mjs) (default `demo`). |
+| `pnpm test` | Vitest (no tests in the repo yet) |
 
-```bash
-pnpm test
+## What’s what
+
+- **[`cdn-simulator.mjs`](cdn-simulator.mjs)** — dependency-free `node:http` **CDN simulator** (reverse proxy). Simulates a **shared edge CDN**: honors `no-store` / `private` / `s-maxage=0`, prefers `s-maxage` and `max-age` when they imply a positive TTL, and when the origin is silent (or only sends `max-age=0` on public HTML) applies **default edge TTLs** (e.g. long for `/assets/…` fingerprints, 300s for HTML). Purge still works with origin + synthetic tags (`edge-cdn`, `html`, `static`, …). Not production-grade.
+- **`/`** (home) — same news **page-cached regions** (hero + latest) with labeled borders, **`getTrending`** (client call) for trending (JSON + `generatedAt` for HIT/MISS proof), and **newsroom** publish + CDN-simulator purge. Route: [`src/routes/index.tsx`](src/routes/index.tsx). Publish API: [`src/routes/__newsroom/publish-trending.ts`](src/routes/__newsroom/publish-trending.ts) (HTTP path **`POST /publish-trending`**). [`src/routes/ppc-demo.tsx`](src/routes/ppc-demo.tsx) only redirects to `/`.
+- **Vite** — [`vite.config.ts`](vite.config.ts) enables TanStack Start with `@vitejs/plugin-rsc` and `tanstackStart({ rsc: { enabled: true } })`.
+
+## Project layout
+
 ```
+src/routes/           File-based routes (__root, index, about, ppc-demo, __newsroom/…)
+src/components/       Header, Footer, ThemeToggle, ppc/* (news UI + region frames)
+src/data/             Static article seed data
+src/server/           getTrending + in-memory trending store
+src/styles/ppc.css    PPC border variables (imported from styles.css)
+cdn-simulator.mjs     Local CDN simulator (port 8080)
+scripts/ppc-demo.mjs  One-command build + preview + cdn-simulator
+```
+
+Generated: `src/routeTree.gen.ts` (do not edit by hand).
 
 ## Styling
 
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
+[Tailwind CSS v4](https://tailwindcss.com/) via `@tailwindcss/vite`. Global styles: [`src/styles.css`](src/styles.css), including [`src/styles/ppc.css`](src/styles/ppc.css) for PPC demo frames.
 
-### Removing Tailwind CSS
+## Testing
 
-If you prefer not to use Tailwind CSS:
+[Vitest](https://vitest.dev/) is configured; there are no `*.test`/`*.spec` files yet. `pnpm test` will exit with “no test files” until you add some.
 
-1. Remove the demo pages in `src/routes/demo/`
-2. Replace the Tailwind import in `src/styles.css` with your own styles
-3. Remove `tailwindcss()` from the plugins array in `vite.config.ts`
-4. Uninstall the packages: `pnpm add @tailwindcss/vite tailwindcss --dev`
+## Learn more
 
-
-
-## Routing
-
-This project uses [TanStack Router](https://tanstack.com/router) with file-based routing. Routes are managed as files in `src/routes`.
-
-### Adding A Route
-
-To add a new route to your application just add a new file in the `./src/routes` directory.
-
-TanStack will automatically generate the content of the route file for you.
-
-Now that you have two routes you can use a `Link` component to navigate between them.
-
-### Adding Links
-
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
-
-```tsx
-import { Link } from "@tanstack/react-router";
-```
-
-Then anywhere in your JSX you can use it like so:
-
-```tsx
-<Link to="/about">About</Link>
-```
-
-This will create a link that will navigate to the `/about` route.
-
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
-
-### Using A Layout
-
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you render `{children}` in the `shellComponent`.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'My App' },
-    ],
-  }),
-  shellComponent: ({ children }) => (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <header>
-          <nav>
-            <Link to="/">Home</Link>
-            <Link to="/about">About</Link>
-          </nav>
-        </header>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  ),
-})
-```
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-## Server Functions
-
-TanStack Start provides server functions that allow you to write server-side code that seamlessly integrates with your client components.
-
-```tsx
-import { createServerFn } from '@tanstack/react-start'
-
-const getServerTime = createServerFn({
-  method: 'GET',
-}).handler(async () => {
-  return new Date().toISOString()
-})
-
-// Use in a component
-function MyComponent() {
-  const [time, setTime] = useState('')
-  
-  useEffect(() => {
-    getServerTime().then(setTime)
-  }, [])
-  
-  return <div>Server time: {time}</div>
-}
-```
-
-## API Routes
-
-You can create API routes by using the `server` property in your route definitions:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { json } from '@tanstack/react-start'
-
-export const Route = createFileRoute('/api/hello')({
-  server: {
-    handlers: {
-      GET: () => json({ message: 'Hello, World!' }),
-    },
-  },
-})
-```
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-
-export const Route = createFileRoute('/people')({
-  loader: async () => {
-    const response = await fetch('https://swapi.dev/api/people')
-    return response.json()
-  },
-  component: PeopleComponent,
-})
-
-function PeopleComponent() {
-  const data = Route.useLoaderData()
-  return (
-    <ul>
-      {data.results.map((person) => (
-        <li key={person.name}>{person.name}</li>
-      ))}
-    </ul>
-  )
-}
-```
-
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-# Demo files
-
-Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
-
-For TanStack Start specific documentation, visit [TanStack Start](https://tanstack.com/start).
+- [TanStack Start](https://tanstack.com/start)
+- [TanStack Router](https://tanstack.com/router)
+- [TanStack Start — Server components](https://tanstack.com/start/latest/docs/framework/react/guide/server-components)
+- [TanStack Start — Server functions](https://tanstack.com/start/latest/docs/framework/react/guide/server-functions)
