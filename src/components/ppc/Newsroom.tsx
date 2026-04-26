@@ -1,7 +1,5 @@
 import { useState } from 'react'
 
-const PURGE_TOKEN = 'demo'
-
 function purgeBaseUrl() {
   if (typeof window === 'undefined') return 'http://localhost:8080'
   return window.location.port === '8080' ? '' : 'http://localhost:8080'
@@ -45,10 +43,7 @@ export function Newsroom() {
       const base = purgeBaseUrl()
       const res = await fetch(`${base}/__cache/purge`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Purge-Token': PURGE_TOKEN,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tag: 'trending' }),
       })
       const data = (await res.json()) as { purged?: number; error?: string }
@@ -74,10 +69,7 @@ export function Newsroom() {
       const base = purgeBaseUrl()
       const res = await fetch(`${base}/__cache/purge`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Purge-Token': PURGE_TOKEN,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ all: true }),
       })
       const data = (await res.json()) as { purged?: number; error?: string }

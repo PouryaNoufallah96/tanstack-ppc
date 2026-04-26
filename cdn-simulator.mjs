@@ -10,7 +10,6 @@ const PROXY_PORT = 8080
 const ORIGIN_HOST = 'localhost'
 const ORIGIN_PORT = 3000
 const MAX_ENTRIES = 1000
-const PURGE_TOKEN = 'demo'
 
 /** @typedef {'origin' | 'heuristic'} CdnTtlMode */
 
@@ -336,14 +335,6 @@ function forwardHeaders(clientReq) {
 // --- control API --------------------------------------------------------------
 
 /**
- * @param {import('node:http').IncomingMessage} req
- */
-function isAuthorized(req) {
-  const t = getHeaderValue(req, 'x-purge-token')
-  return t === PURGE_TOKEN
-}
-
-/**
  * @param {import('node:http').ServerResponse} res
  * @param {object} data
  * @param {number} [code]
@@ -394,10 +385,6 @@ const server = http.createServer((clientReq, clientRes) => {
   const pathname = u.split('?')[0] ?? u
 
   if (pathname === '/__cache' || u.startsWith('/__cache?')) {
-    if (!isAuthorized(clientReq)) {
-      sendText(clientRes, 'Forbidden', 403)
-      return
-    }
     if (clientReq.method !== 'GET') {
       sendText(clientRes, 'Method Not Allowed', 405)
       return
@@ -407,10 +394,6 @@ const server = http.createServer((clientReq, clientRes) => {
   }
 
   if (pathname === '/__cache/purge') {
-    if (!isAuthorized(clientReq)) {
-      sendText(clientRes, 'Forbidden', 403)
-      return
-    }
     if (clientReq.method !== 'POST') {
       sendText(clientRes, 'Method Not Allowed', 405)
       return
@@ -460,10 +443,6 @@ const server = http.createServer((clientReq, clientRes) => {
   }
 
   if (pathname === '/__cache/view') {
-    if (!isAuthorized(clientReq)) {
-      sendText(clientRes, 'Forbidden', 403)
-      return
-    }
     if (clientReq.method !== 'GET') {
       sendText(clientRes, 'Method Not Allowed', 405)
       return
@@ -666,8 +645,7 @@ const CACHE_VIEW_HTML = `<!DOCTYPE html>
   </div>
   <p class="muted" id="summary"></p>
   <script>
-  const TOKEN = ${JSON.stringify(PURGE_TOKEN)};
-  const headers = { 'Content-Type': 'application/json', 'X-Purge-Token': TOKEN };
+  const headers = { 'Content-Type': 'application/json' };
 
   function rowClass(e) {
     const now = Date.now();
@@ -718,7 +696,7 @@ const CACHE_VIEW_HTML = `<!DOCTYPE html>
   async function tick() {
     const st = document.getElementById('status');
     try {
-      const r = await fetch('/__cache', { headers: { 'X-Purge-Token': TOKEN } });
+      const r = await fetch('/__cache');
       const data = await r.json();
       render(data);
       st.textContent = 'Updated ' + new Date().toLocaleTimeString();
@@ -739,5 +717,5 @@ server.listen(PROXY_PORT, () => {
   console.log(
     `CDN simulator listening on http://localhost:${PROXY_PORT} -> http://${ORIGIN_HOST}:${ORIGIN_PORT}`,
   )
-  console.log(`Visualizer: http://localhost:${PROXY_PORT}/__cache/view (X-Purge-Token: ${PURGE_TOKEN})`)
+  console.log(`Visualizer: http://localhost:${PROXY_PORT}/__cache/view`)
 })

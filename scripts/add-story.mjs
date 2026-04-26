@@ -42,7 +42,6 @@ if (rawType !== 'basic' && rawType !== 'interactive') {
 const type = rawType
 
 const timeoutMs = 10_000
-const purgeToken = process.env.PURGE_TOKEN || 'demo'
 
 function candidateBases() {
   const o = process.env.ORIGIN?.trim()
@@ -78,10 +77,7 @@ async function purgeTrendingAtEdge() {
     try {
       const res = await fetch(`${base}/__cache/purge`, {
         method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'x-purge-token': purgeToken,
-        },
+        headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ tag: 'trending' }),
         signal: AbortSignal.timeout(timeoutMs),
       })

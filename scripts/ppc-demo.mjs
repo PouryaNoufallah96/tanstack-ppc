@@ -129,8 +129,8 @@ void (async () => {
   proxy.on('exit', (code, signal) => onOneExit('proxy', code, signal))
 
   console.log(
-    '\n→ App   http://localhost:8080/  (PPC home; /ppc-demo → /)  (proxy → :3000 preview)\n' +
-      '→ Cache http://localhost:8080/__cache/view  (header X-Purge-Token: demo)\n' +
+    '\n→ App   http://localhost:8080/  (PPC home, proxy → :3000 preview)\n' +
+      '→ Cache http://localhost:8080/__cache/view\n' +
       '→ Ctrl+C to stop\n',
   )
 })()

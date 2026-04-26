@@ -6,16 +6,14 @@ This project is a TanStack Start demo app for **partial page caching** with Reac
 
 - TanStack Start app with file-based routing in `src/routes`.
 - React Server Components are enabled in `vite.config.ts` through `@vitejs/plugin-rsc` and `tanstackStart({ rsc: { enabled: true } })`.
-- Main demo route: [`src/routes/index.tsx`](src/routes/index.tsx) — **news-site style** layout (hero, latest grid, trending, newsroom, cache legend) on the home page.
-- [`src/routes/ppc-demo.tsx`](src/routes/ppc-demo.tsx) **redirects** to `/` for old bookmarks.
-- Global shell lives in `src/routes/__root.tsx`.
-- The root shell in `__root.tsx` has **no** top nav; `Header.tsx` is unused. `Footer` includes `ThemeToggle` for light/dark.
+- Single demo route: [`src/routes/index.tsx`](src/routes/index.tsx) — **news-site style** layout (hero, latest grid, trending, newsroom, cache legend) on the home page.
+- Global shell lives in `src/routes/__root.tsx` and is intentionally minimal — no header, no footer, no theme toggle.
 
 ## PPC / news demo
 
 - **Page regions (visual, “page cache”)** — hero and latest grid are **SSR** from the home route loader and use [`PageCacheRegion`](src/components/ppc/PageCacheRegion.tsx) with blue dashed borders and `route: / · ttl: 300s` in the metadata strip. Content comes from [`src/data/articles.ts`](src/data/articles.ts) (fixed `minutesAgo` values, not `Date.now()`).
-- **Trending (PPC fragment)** — [`getTrending`](src/server/trending.ts) is a `GET` server function that returns `{ stories, generatedAt }`, sets `Cache-Control: max-age=0, s-maxage=30` and `Cache-Tag: trending, homepage`. [`TrendingClient`](src/components/ppc/TrendingClient.tsx) calls it **in the browser** after load (not in the route loader) so the fragment stays an independent `GET /_serverFn/…` request. The UI shows **`Generated at &lt;ISO&gt;`** so a **HIT** keeps the timestamp, a **MISS** refreshes it.
-- **Newsroom** — [`Newsroom.tsx`](src/components/ppc/Newsroom.tsx): `POST /publish-trending` appends a story via [`src/routes/__newsroom/publish-trending.ts`](src/routes/__newsroom/publish-trending.ts) (TanStack file routing maps this file to HTTP path **`/publish-trending`**, not `/__newsroom/...`). Purge buttons call the **CDN simulator** at `POST /__cache/purge` with `X-Purge-Token: demo` (same origin on port 8080, or `http://localhost:8080` when the app is opened on port 3000).
+- **Trending (PPC fragment)** — [`getTrending`](src/server/trending.tsx) is a `GET` server function that calls `renderServerComponent(<Trending …/>)`, sets `Cache-Control: max-age=0, s-maxage=30` and `Cache-Tag: trending, homepage`, and returns the renderable so the framework streams a Flight payload. [`TrendingClient`](src/components/ppc/TrendingClient.tsx) calls it **in the browser** after load (not in the route loader) so the fragment stays an independent `GET /_serverFn/…` request. The UI shows **`Generated at &lt;ISO&gt;`** inside the rendered RSC, so a **HIT** keeps the timestamp and a **MISS** refreshes it. Each story has a `type: 'basic' | 'interactive'` field; basic tiles render with the server-only [`BasicStory`](src/components/ppc/BasicStory.tsx) (no JS shipped), interactive tiles render with the `'use client'` [`InteractiveStory`](src/components/ppc/InteractiveStory.tsx) and its chunk is only loaded by the browser when the Flight stream contains an interactive tile.
+- **Newsroom** — [`Newsroom.tsx`](src/components/ppc/Newsroom.tsx): `POST /publish-trending` appends a story via [`src/routes/__newsroom/publish-trending.ts`](src/routes/__newsroom/publish-trending.ts) (TanStack file routing maps this file to HTTP path **`/publish-trending`**, not `/__newsroom/...`). Purge buttons call the **CDN simulator** at `POST /__cache/purge` (same origin on port 8080, or `http://localhost:8080` when the app is opened on port 3000).
 
 ## CDN simulator
 
@@ -43,7 +41,7 @@ Control endpoints are served by the simulator (port 8080), same process as the f
 - `POST /__cache/purge` purges by `{ "key" }`, `{ "tag" }`, or `{ "all": true }`.
 - `GET /__cache/view` serves the dark-mode visualizer.
 
-All `/__cache` endpoints require `X-Purge-Token: demo`.
+`/__cache` endpoints are open — no auth header is required (this is a local demo simulator).
 
 ## Scripts
 

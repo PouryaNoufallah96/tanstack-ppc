@@ -9,21 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as PpcDemoRouteImport } from './routes/ppc-demo'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as _newsroomPublishTrendingRouteImport } from './routes/__newsroom/publish-trending'
 
-const PpcDemoRoute = PpcDemoRouteImport.update({
-  id: '/ppc-demo',
-  path: '/ppc-demo',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -38,54 +26,32 @@ const _newsroomPublishTrendingRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/ppc-demo': typeof PpcDemoRoute
   '/publish-trending': typeof _newsroomPublishTrendingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/ppc-demo': typeof PpcDemoRoute
   '/publish-trending': typeof _newsroomPublishTrendingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/ppc-demo': typeof PpcDemoRoute
   '/__newsroom/publish-trending': typeof _newsroomPublishTrendingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/ppc-demo' | '/publish-trending'
+  fullPaths: '/' | '/publish-trending'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/ppc-demo' | '/publish-trending'
-  id: '__root__' | '/' | '/about' | '/ppc-demo' | '/__newsroom/publish-trending'
+  to: '/' | '/publish-trending'
+  id: '__root__' | '/' | '/__newsroom/publish-trending'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
-  PpcDemoRoute: typeof PpcDemoRoute
   _newsroomPublishTrendingRoute: typeof _newsroomPublishTrendingRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/ppc-demo': {
-      id: '/ppc-demo'
-      path: '/ppc-demo'
-      fullPath: '/ppc-demo'
-      preLoaderRoute: typeof PpcDemoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -105,8 +71,6 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
-  PpcDemoRoute: PpcDemoRoute,
   _newsroomPublishTrendingRoute: _newsroomPublishTrendingRoute,
 }
 export const routeTree = rootRouteImport
